@@ -134,3 +134,97 @@ pd.DataFrame(topic_results).to_csv('outputs/churn_drivers.csv', index=False)
 
 # 4. Export Seller Rankings
 seller_stats.sort_values(by='seller_score', ascending=False).to_csv('outputs/seller_rankings.csv', index=False)
+
+# ==========================================
+# --- PHASE 6: EXHAUSTIVE VISUALIZATION EXPORT ---
+# ==========================================
+print("\n--- STARTING PHASE 6: EXPORTING ARTIFACTS & VISUAL REPORTS ---")
+import os
+if not os.path.exists('outputs'):
+    os.makedirs('outputs')
+
+# --- 1. Export Raw CSV Artifacts ---
+df.to_csv('outputs/cleaned_reviews.csv', index=False)
+seller_stats.sort_values(by='seller_score', ascending=False).to_csv('outputs/seller_rankings.csv', index=False)
+
+print("Generating comprehensive business dashboards (PNGs)...")
+sns.set_theme(style="whitegrid")
+
+# Helper function to save plots cleanly
+def save_plot(filename):
+    plt.tight_layout()
+    plt.savefig(f'outputs/{filename}')
+    plt.clf()
+
+# --- CHART 1 & 2: Top & Worst Products (Things) ---
+# Note: If your CSV doesn't have a 'product_name' column, we safely fall back to 'shop_id'
+item_col = 'product_name' if 'product_name' in df.columns else 'shop_id' 
+item_sales = df.groupby(item_col)['sold'].sum().sort_values(ascending=False)
+
+plt.figure(figsize=(10, 6))
+top_items = item_sales.head(10)
+sns.barplot(x=top_items.values, y=top_items.index.astype(str), hue=top_items.index.astype(str), palette='Blues_r', legend=False)
+plt.title('1. Top 10 Best-Selling Items')
+plt.xlabel('Total Units Sold')
+save_plot('1_top_sales_things.png')
+
+plt.figure(figsize=(10, 6))
+# We filter > 0 to find items that actually have real but poor sales, ignoring dead listings
+worst_items = item_sales[item_sales > 0].tail(10) 
+sns.barplot(x=worst_items.values, y=worst_items.index.astype(str), hue=worst_items.index.astype(str), palette='Reds_r', legend=False)
+plt.title('2. Bottom 10 Worst-Selling Items (Non-Zero)')
+plt.xlabel('Total Units Sold')
+save_plot('2_worst_sales_things.png')
+
+
+# --- CHART 3 & 4: Top & Worst Sellers ---
+seller_sales = df.groupby('shop_id')['sold'].sum().sort_values(ascending=False)
+
+plt.figure(figsize=(10, 6))
+top_sellers_vol = seller_sales.head(10)
+sns.barplot(x=top_sellers_vol.values, y=top_sellers_vol.index.astype(str), hue=top_sellers_vol.index.astype(str), palette='Greens_r', legend=False)
+plt.title('3. Top 10 Sellers by Total Sales Volume')
+plt.xlabel('Total Units Sold')
+save_plot('3_top_sellers.png')
+
+plt.figure(figsize=(10, 6))
+worst_sellers_vol = seller_sales[seller_sales > 0].tail(10)
+sns.barplot(x=worst_sellers_vol.values, y=worst_sellers_vol.index.astype(str), hue=worst_sellers_vol.index.astype(str), palette='Oranges_r', legend=False)
+plt.title('4. Bottom 10 Sellers by Total Sales Volume (Non-Zero)')
+plt.xlabel('Total Units Sold')
+save_plot('4_worst_sellers.png')
+
+# --- CHART 7: Most Used Words in All Reviews ---
+print("Calculating overall word frequencies...")
+custom_stop_words = ['yang', 'di', 'dan', 'ini', 'itu', 'dengan', 'untuk', 'tidak', 'ke', 'dari', 'ada', 'yg', 'barang', 'nya', 'saya', 'tapi']
+vec_all = CountVectorizer(max_features=20, stop_words=custom_stop_words)
+X_all = vec_all.fit_transform(df['cleaned_text'])
+word_freq = pd.DataFrame({'word': vec_all.get_feature_names_out(), 'freq': X_all.sum(axis=0).A1}).sort_values(by='freq', ascending=False)
+
+plt.figure(figsize=(10, 8))
+sns.barplot(x='freq', y='word', hue='word', data=word_freq, palette='magma', legend=False)
+plt.title('7. Top 20 Most Used Words in All Reviews')
+plt.xlabel('Frequency')
+save_plot('7_most_used_words.png')
+
+
+# --- CHART 8: Sentiment Distribution ---
+plt.figure(figsize=(6, 6))
+# Using 'explode' to visually separate the negative reviews slice
+plt.pie(df_binary['sentiment'].value_counts(), labels=['Positive (4-5 Stars)', 'Negative (1-2 Stars)'], 
+        autopct='%1.1f%%', colors=['#2ecc71', '#e74c3c'], startangle=90, explode=(0, 0.1))
+plt.title('8. Platform Sentiment Distribution')
+save_plot('8_sentiment_distribution.png')
+
+
+# --- CHART 9 (DATA SCIENCE BONUS): Sentiment Health by Category ---
+plt.figure(figsize=(12, 6))
+# This calculates the percentage of positive reviews per category
+sentiment_cat = df_binary.groupby('category')['sentiment'].mean().sort_values() * 100
+sns.barplot(x=sentiment_cat.values, y=sentiment_cat.index.astype(str), hue=sentiment_cat.index.astype(str), palette='RdYlGn', legend=False)
+plt.title('9. Sentiment Health: % of Positive Reviews by Category')
+plt.xlabel('Percentage of Positive Reviews (%)')
+plt.xlim(0, 100)
+save_plot('9_sentiment_by_category.png')
+
+print("Success! All 9 visualizations have been exported to the 'outputs' folder.")
