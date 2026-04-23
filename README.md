@@ -1,10 +1,10 @@
-# 🛍️ E-Commerce Voice of Customer (VoC) Intelligence & Seller Ranking System
+# E-Commerce Voice of Customer (VoC) Intelligence & Seller Ranking System
 
 An end-to-end Data Science pipeline designed to automatically analyze e-commerce product reviews, identify churn-risk customers, extract the root causes of dissatisfaction, and rank seller performance.
 
 ---
 
-## 🚀 The Business Problem: The "Accuracy Paradox"
+## The Business Problem: The "Accuracy Paradox"
 
 E-commerce platforms face a significant challenge when analyzing customer feedback. Because the vast majority of online reviews default to 5-stars, simple machine learning models will achieve high overall accuracy by simply ignoring the rare, critical 1-star reviews. However, it is these exact negative reviews that drive customer churn and highlight operational failures.
 
@@ -16,7 +16,7 @@ By processing over 40,000 real-world product reviews from Tokopedia, this pipeli
 
 ---
 
-## 🛠️ The Architecture: Phase-by-Phase Breakdown
+## The Architecture: Phase-by-Phase Breakdown
 
 ### Phase 1: Data Pre-processing & Exploratory Data Analysis (EDA)
 Before deploying any machine learning, we analyzed the shape of the data to inform our strategy and cleaned the text using Regular Expressions (lowercasing, removing URLs, handling missing values).
@@ -82,7 +82,7 @@ We mapped out the top sellers driving the platform's revenue to ensure VIP merch
 
 ---
 
-## 💻 Tech Stack
+## Tech Stack
 * **Language:** Python
 * **Data Manipulation:** Pandas, NumPy
 * **Machine Learning & NLP:** Scikit-Learn (`LogisticRegression`, `TfidfVectorizer`, `LatentDirichletAllocation`, `MinMaxScaler`)
