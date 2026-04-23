@@ -32,16 +32,20 @@ As the chart shows, the dataset is overwhelmingly skewed. Over 75% of the review
 We discovered a behavioral trend: 5-star reviews tend to be extremely short, while 1-star and 2-star reviews exhibit a "long tail" of extensive, paragraph-length complaints. This confirms that negative reviews contain rich textual data ready for NLP extraction.
 
 ### Phase 2: Binary Sentiment "Model Bake-Off"
-We tested three different classification algorithms using a TF-IDF Vectorizer to determine the best approach for our highly imbalanced data.
+We tested three different classification algorithms using a TF-IDF Vectorizer to determine the best approach for our highly imbalanced data. To improve performance, we removed neutral 3-star reviews and grouped the data into Binary Sentiment: **Positive (Class 1)** vs **Negative (Class 0)**.
+
+Here is the exact performance breakdown:
 
 | Model | Overall Accuracy | Sentiment Class | Precision | Recall | F1-Score |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Logistic Regression (Balanced)** | **95.43%** | **Negative (0)** | 0.32 | **0.82** | 0.46 |
 | | | **Positive (1)** | 1.00 | 0.96 | 0.98 |
 | **Naive Bayes** | 97.88% | **Negative (0)** | 0.75 | 0.16 | 0.27 |
-| **Random Forest** | 97.82% | **Negative (0)** | 0.67 | 0.17 | 0.27 |
+| | | **Positive (1)** | 0.98 | 1.00 | 0.99 |
+| **Random Forest** | 97.88% | **Negative (0)** | 0.70 | 0.19 | 0.30 |
+| | | **Positive (1)** | 0.98 | 1.00 | 0.99 |
 
-**The Verdict:** While Naive Bayes and Random Forest achieved higher overall accuracy (~98%), they failed the business objective by missing almost all of the negative reviews (Recall: ~16%). By explicitly penalizing our Logistic Regression algorithm for missing the minority class (`class_weight='balanced'`), we successfully captured **82% of all negative reviews**.
+**The Verdict:** While Naive Bayes and Random Forest achieved higher overall accuracy (~97.88%), they failed the business objective by missing the vast majority of the negative reviews (Recall: 16% and 19%, respectively). By explicitly penalizing our Logistic Regression algorithm for missing the minority class (`class_weight='balanced'`), we traded a tiny fraction of overall accuracy to successfully capture **82% of all negative reviews**. This is the difference between an algorithm that just chases high scores and an algorithm that actually prevents customer churn.
 
 ### Phase 2.5: Deep Dive Model Evaluation & Explainable AI (XAI)
 To prove the model's reliability to stakeholders, we generated detailed performance artifacts.
