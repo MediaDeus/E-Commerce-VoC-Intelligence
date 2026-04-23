@@ -23,10 +23,12 @@ Before deploying any machine learning, we analyzed the shape of the data to info
 
 **Insight 1: The Class Imbalance**
 ![Rating Distribution](outputs/rating_distribution.png)
+
 As the chart shows, the dataset is overwhelmingly skewed. Over 75% of the reviews are 5-stars. This informed our decision to pivot away from a standard 5-class prediction model toward a **Binary Sentiment model** (Positive vs. Negative) to isolate the churn risk.
 
 **Insight 2: Customer Behavior Mapping**
 ![Review Length vs Rating](outputs/review_length_vs_rating.png)
+
 We discovered a behavioral trend: 5-star reviews tend to be extremely short, while 1-star and 2-star reviews exhibit a "long tail" of extensive, paragraph-length complaints. This confirms that negative reviews contain rich textual data ready for NLP extraction.
 
 ### Phase 2: Binary Sentiment "Model Bake-Off"
@@ -46,14 +48,17 @@ To prove the model's reliability to stakeholders, we generated detailed performa
 
 **Where does the AI make mistakes?**
 ![Confusion Matrix](outputs/model_confusion_matrix.png)
+
 The Confusion Matrix visualization proves we minimized False Negatives (missing an angry customer), which is the most expensive mistake for an e-commerce platform.
 
 **Model Confidence**
 ![ROC Curve](outputs/model_roc_curve.png)
+
 An Area Under the Curve (AUC) score approaching 1.0 indicates our model is mathematically stable and highly confident in distinguishing between positive and negative text.
 
 **Why did the AI make that choice?**
 ![Feature Importance](outputs/model_feature_importance.png)
+
 This chart provides Explainable AI (XAI). It demonstrates exactly which Indonesian keywords the algorithm mathematically associates with churn risk (Negative Weight) versus satisfaction (Positive Weight).
 
 ### Phase 3: Root Cause Extraction (Topic Modeling)
@@ -69,6 +74,7 @@ We then exported a suite of Executive Dashboards to summarize the platform's hea
 
 **Sentiment Health by Category**
 ![Sentiment by Category](outputs/sentiment_by_category.png)
+
 This visualization highlights exactly which product categories are driving the negative sentiment, allowing managers to target their interventions.
 
 **Top Sellers vs. At-Risk Sellers**
